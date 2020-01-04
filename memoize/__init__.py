@@ -346,10 +346,15 @@ class Memoizer(object):
                     return f(*args, **kwargs)
 
                 try:
-                    cache_key = decorated_function.make_cache_key(
-                        f, *args, **kwargs
-                    )
-                    rv = self.get(cache_key)
+                    try:
+                        cache_key = decorated_function.make_cache_key(
+                            f, *args, **kwargs
+                        )
+                        rv = self.get(cache_key)
+                    except (ValueError, UnicodeDecodeError):
+                        logger.error("Exception possibly due to python version migration (2 <-> 3), flushing the cache")
+                        self.cache.clear()
+                        cache_key = decorated_function.make_cache_key(f, *args, **kwargs)
                 except Exception:
                     if settings.DEBUG:
                         raise
