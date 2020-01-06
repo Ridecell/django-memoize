@@ -355,6 +355,7 @@ class Memoizer(object):
                         logger.error("Exception possibly due to python version migration (2 <-> 3), flushing the cache")
                         self.cache.clear()
                         cache_key = decorated_function.make_cache_key(f, *args, **kwargs)
+                        rv = self.get(cache_key)
                 except Exception:
                     if settings.DEBUG:
                         raise
